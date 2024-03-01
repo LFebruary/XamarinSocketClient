@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -27,11 +25,11 @@ namespace XamarinClient
     internal class MainViewModel : MvvmHelpers.BaseViewModel
     {
         #region Fields
-        protected   CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
-        public      bool                    deferActions = false;
+        protected CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        public bool deferActions = false;
         #endregion
 
-        private MainPage mainPage;
+        private readonly MainPage mainPage;
 
         private bool _receiverFlag = true;
         public bool ReceiverFlag
@@ -53,10 +51,10 @@ namespace XamarinClient
 
         private void TryToStartClient()
         {
-            IPAddress   ipAddress   = IPAddress.Parse("192.168.1.37");
-            FarDebug.WriteLine("IP address created");
-            IPEndPoint  remoteEP    = new IPEndPoint(ipAddress, 5050);
-            FarDebug.WriteLine("remoteEndPoint created");
+            IPAddress ipAddress = IPAddress.Parse("192.168.1.37");
+            CustomDebug.WriteLine("IP address created");
+            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 5050);
+            CustomDebug.WriteLine("remoteEndPoint created");
             do
             {
                 byte[] bytes = new byte[1024];
@@ -64,58 +62,58 @@ namespace XamarinClient
                 try
                 {
                     Socket receiver = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                    FarDebug.WriteLine("Receiver socket created");
+                    CustomDebug.WriteLine("Receiver socket created");
                     try
                     {
-                        FarDebug.WriteLine("Before receiver socket connect");
+                        CustomDebug.WriteLine("Before receiver socket connect");
                         receiver.Connect(remoteEP);
-                        FarDebug.WriteLine("After receiver socket connect");
+                        CustomDebug.WriteLine("After receiver socket connect");
 
-                        FarDebug.WriteLine($"Socket connected to {receiver.RemoteEndPoint}");
+                        CustomDebug.WriteLine($"Socket connected to {receiver.RemoteEndPoint}");
 
-                        FarDebug.WriteLine("Before receiver.Receive(bytes)");
+                        CustomDebug.WriteLine("Before receiver.Receive(bytes)");
                         int bytesRec = receiver.Receive(bytes);
-                        FarDebug.WriteLine("After receiver.Receive(bytes)");
+                        CustomDebug.WriteLine("After receiver.Receive(bytes)");
 
-                        FarDebug.WriteLine("Before Encoding.ASCII.GetString(bytes, 0, bytesRec)");
+                        CustomDebug.WriteLine("Before Encoding.ASCII.GetString(bytes, 0, bytesRec)");
                         var socketStringValue = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                        FarDebug.WriteLine("After Encoding.ASCII.GetString(bytes, 0, bytesRec)");
-                        FarDebug.WriteLine($"string value: {socketStringValue}");
+                        CustomDebug.WriteLine("After Encoding.ASCII.GetString(bytes, 0, bytesRec)");
+                        CustomDebug.WriteLine($"string value: {socketStringValue}");
                         SocketValue = socketStringValue;
 
                     }
                     catch (ArgumentNullException ane)
                     {
-                        FarDebug.WriteLine($"ArgumentNullException : {ane}");
+                        CustomDebug.WriteLine($"ArgumentNullException : {ane}");
                     }
                     catch (SocketException se)
                     {
                         if (se.ErrorCode == 10054 || se.ErrorCode == 10061)
                         {
-                            FarDebug.WriteLine("Server is currently offline.\nPress any key to retry");
+                            CustomDebug.WriteLine("Server is currently offline.\nPress any key to retry");
                         }
                         else
                         {
-                            FarDebug.WriteLine($"SocketException : {se}");
+                            CustomDebug.WriteLine($"SocketException : {se}");
                         }
                     }
                     catch (Exception e)
                     {
-                        FarDebug.WriteLine($"Unexpected exception : {e}");
+                        CustomDebug.WriteLine($"Unexpected exception : {e}");
                     }
                 }
                 catch (Exception e)
                 {
-                    FarDebug.WriteLine(e.ToString());
+                    CustomDebug.WriteLine(e.ToString());
                 }
             }
             while (ReceiverFlag);
         }
 
         private string _socketValue;
-        public string SocketValue 
-        { 
-            get => _socketValue; 
+        public string SocketValue
+        {
+            get => _socketValue;
             set => SetProperty(ref _socketValue, value);
         }
     }
@@ -243,11 +241,11 @@ namespace XamarinClient
     /// <remarks>
     /// These methods are provided in a separate class since as of writing C# does not support static extensions.
     /// </remarks>
-    public static class FarDebug
+    public static class CustomDebug
     {
         #region Package File Path Separator
 
-        private static string packageSeparator { get; set; } = @"\XamarinClient\";
+        private static string PackageSeparator { get; set; } = @"\XamarinClient\";
 
         #endregion
 
@@ -273,7 +271,7 @@ namespace XamarinClient
         [Conditional("DEBUG")]
         public static void WriteLine(string message, bool addBlankLine = false, [CallerFilePath] string filePath = "", [CallerMemberName] string caller = "", [CallerLineNumber] int line = -1)
         {
-            string fileString = filePath.Split(new string[] { packageSeparator }, StringSplitOptions.None).Last();
+            string fileString = filePath.Split(new string[] { PackageSeparator }, StringSplitOptions.None).Last();
 
             Debug.WriteLine($"{fileString}: {caller}: line {line}: {message}");
 

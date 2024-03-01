@@ -63,27 +63,27 @@ namespace XamarinClient
                     }
                     catch (ArgumentNullException ane)
                     {
-                        FarDebug.WriteLine($"ArgumentNullException : {ane}");
+                        CustomDebug.WriteLine($"ArgumentNullException : {ane}");
                     }
                     catch (SocketException se)
                     {
                         if (se.ErrorCode == 10054 || se.ErrorCode == 10061)
                         {
-                            FarDebug.WriteLine("Server is currently offline.");
+                            CustomDebug.WriteLine("Server is currently offline.");
                         }
                         else
                         {
-                            FarDebug.WriteLine($"SocketException : {se}");
+                            CustomDebug.WriteLine($"SocketException : {se}");
                         }
                     }
                     catch (Exception e)
                     {
-                        FarDebug.WriteLine($"Unexpected exception : {e}");
+                        CustomDebug.WriteLine($"Unexpected exception : {e}");
                     }
                 }
                 catch (Exception e)
                 {
-                    FarDebug.WriteLine(e.ToString());
+                    CustomDebug.WriteLine(e.ToString());
                 }
             }
             while (ReceiverFlag);
@@ -104,7 +104,5 @@ namespace XamarinClient
 
             });
         }
-
-        private int 
     }
 }
